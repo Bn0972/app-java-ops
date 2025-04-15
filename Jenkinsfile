@@ -19,33 +19,41 @@ pipeline {
         stage('Compile') {
             steps {
                 // Create a directory for compiled classes
-                bat 'if not exist build\\classes mkdir build\\classes'
+                sh 'if not exist build\\classes mkdir build\\classes'
                 // Kompilacja Main.java
-                bat '"%JAVA_HOME%\\bin\\javac" -d build\\classes Main.java'
+                sh '"%JAVA_HOME%\\bin\\javac" -d build\\classes Main.java'
             }
         }
 
         stage('Prepare Manifest') {
             steps {
                 // Places the manifest file directly in the buildclasses directory
-                bat 'echo Main-Class: Main > build\\classes\\MANIFEST.MF'
+                sh 'echo Main-Class: Main > build\\classes\\MANIFEST.MF'
             }
         }
 
         stage('Package') {
             steps {
                 // Packaging compiled classes into a JAR file with a manifest file
-                bat 'if not exist build\\jar mkdir build\\jar'
+                sh 'if not exist build\\jar mkdir build\\jar'
                 // Uses a direct path to the manifest file located in buildclasses
-                bat 'cd build\\classes && "%JAVA_HOME%\\bin\\jar" cvmf MANIFEST.MF ..\\jar\\MyApplication.jar *'
+                sh 'cd build\\classes && "%JAVA_HOME%\\bin\\jar" cvmf MANIFEST.MF ..\\jar\\MyApplication.jar *'
             }
         }
 
         stage('Run') {
             steps {
                 // Running an application from a JAR file
-                bat '"%JAVA_HOME%\\bin\\java" -jar build\\jar\\MyApplication.jar'
+                sh '"%JAVA_HOME%\\bin\\java" -jar build\\jar\\MyApplication.jar'
             }
         }
     }
 }
+
+
+
+
+
+
+
+
