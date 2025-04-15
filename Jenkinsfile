@@ -1,14 +1,14 @@
 pipeline {
     agent any
     tools {
-        // Use the JDK version named "Java 21" configured in Jenkins
-        jdk 'Java'
+        jdk 'Java'  // 确保你在 Jenkins 配置中有一个名为 "Java" 的 JDK
     }
 
     environment {
-        // Defining JAVA_HOME may be optional, depending on your Jenkins configuration
         JAVA_HOME = tool 'Java'
+        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
+
     stages {
         stage('Checkout') {
             steps {
@@ -18,42 +18,37 @@ pipeline {
 
         stage('Compile') {
             steps {
-                // Create a directory for compiled classes
-                sh 'if not exist build\\classes mkdir build\\classes'
-                // Kompilacja Main.java
-                sh '"%JAVA_HOME%\\bin\\javac" -d build\\classes Main.java'
+                sh '''
+                    mkdir -p build/classes
+                    javac -d build/classes Main.java
+                '''
             }
         }
 
         stage('Prepare Manifest') {
             steps {
-                // Places the manifest file directly in the buildclasses directory
-                sh 'echo Main-Class: Main > build\\classes\\MANIFEST.MF'
+                sh '''
+                    echo "Main-Class: Main" > build/classes/MANIFEST.MF
+                '''
             }
         }
 
         stage('Package') {
             steps {
-                // Packaging compiled classes into a JAR file with a manifest file
-                sh 'if not exist build\\jar mkdir build\\jar'
-                // Uses a direct path to the manifest file located in buildclasses
-                sh 'cd build\\classes && "%JAVA_HOME%\\bin\\jar" cvmf MANIFEST.MF ..\\jar\\MyApplication.jar *'
+                sh '''
+                    mkdir -p build/jar
+                    cd build/classes
+                    jar cvmf MANIFEST.MF ../jar/MyApplication.jar *
+                '''
             }
         }
 
         stage('Run') {
             steps {
-                // Running an application from a JAR file
-                sh '"%JAVA_HOME%\\bin\\java" -jar build\\jar\\MyApplication.jar'
+                sh '''
+                    java -jar build/jar/MyApplication.jar
+                '''
             }
         }
     }
 }
-
-
-
-
-
-
-
-
